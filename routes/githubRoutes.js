@@ -8,7 +8,7 @@ const {
   getSingleProfile
 } = require("../controllers/githubController");
 
-router.post("/analyze/:username", analyzeProfile);
+router.get("/analyze/:username", analyzeProfile);
 
 router.get("/profiles", getAllProfiles);
 
