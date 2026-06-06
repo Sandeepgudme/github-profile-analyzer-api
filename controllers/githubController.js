@@ -37,18 +37,25 @@ const getAllProfiles = async (req, res) => {
 
 const getSingleProfile = async (req, res) => {
   try {
-    const profile =
-      await profileModel.getProfileByUsername(
-        req.params.username
-      );
+    const { username } = req.params;
 
+    // Check if profile already exists in DB
+    let profile =
+      await profileModel.getProfileByUsername(username);
+
+    // If not, fetch from GitHub and save
     if (!profile) {
-      return res.status(404).json({
-        message: "Profile not found"
-      });
+      const githubProfile =
+        await githubService.analyzeGithubProfile(username);
+
+      await profileModel.saveProfile(githubProfile);
+
+      profile =
+        await profileModel.getProfileByUsername(username);
     }
 
     res.json(profile);
+
   } catch (error) {
     res.status(500).json({
       message: error.message
